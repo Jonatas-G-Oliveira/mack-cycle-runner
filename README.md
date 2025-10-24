@@ -2,10 +2,8 @@
 Jogo de ritmo focado em reabilitação
 
 #To do - proximo commmit 1º semana
-Criar as notas
-Criar a animação do personagem principal
-
-#To do 2ª semana
+Refatorar o projeto e separar em classes
+Criar o menu e adicionar o HUD
 
 
 #Rodar 
