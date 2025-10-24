@@ -7,3 +7,8 @@ Criar a animação do personagem principal
 
 #To do 2ª semana
 
+
+#Rodar 
+./ gradlew run
+
+ou ./gradlew lwjgl3:run
