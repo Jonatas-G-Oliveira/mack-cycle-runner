@@ -2,6 +2,8 @@ package com.jonatas.game;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -24,6 +26,9 @@ public class Main implements ApplicationListener {
     float discoTimer;
     Rectangle discoRectangle;
     Rectangle PersonagemRectangle;
+
+    Sound discoAcertoSound;
+    Music musicaFase1;
 
     Sprite personagemPrincipalSprite;
     Sprite fundoExemploSprite; 
@@ -60,6 +65,12 @@ public class Main implements ApplicationListener {
         esteira.add(4);
         discoRectangle = new Rectangle();
         PersonagemRectangle = new Rectangle();
+
+        discoAcertoSound = Gdx.audio.newSound(Gdx.files.internal("hit.wav"));
+        musicaFase1 = Gdx.audio.newMusic(Gdx.files.internal("bankai.mp3"));
+
+        musicaFase1.setVolume(.5f);
+        musicaFase1.play();
     }
 
     @Override
@@ -86,11 +97,12 @@ public class Main implements ApplicationListener {
         
         //Escolhendo a esteira que o disco vem
         int laneEscolhida = MathUtils.random(0, 1);
-        // discoSprite.setPosition(worldWidth - discoWidth - 2, esteira.get(laneEscolhida));
-        //Clamp no disco que eu criei
+       
         discoSprite.setY(esteira.get(laneEscolhida));
         discoSprite.setX(worldWidth - discoWidth);
         vetorDiscos.add(discoSprite);
+
+       
         
     }
 
@@ -128,18 +140,21 @@ public class Main implements ApplicationListener {
             float discoWidth = disco.getWidth();
             float discoHeight = disco.getHeight();
 
-            disco.translateX(-2f * delta);
+            disco.translateX(-4f * delta);
             discoRectangle.set(disco.getX(), disco.getY(), discoWidth, discoHeight);
 
             if(disco.getX() < -discoWidth){
                 vetorDiscos.removeIndex(i);
             }else if(discoRectangle.overlaps(PersonagemRectangle)){
                 vetorDiscos.removeIndex(i);
+                discoAcertoSound.play();
             }
         }
+        float bpm = 240f;
+        float clicksporbatida = 60f / bpm;
         discoTimer += delta;
-        if (discoTimer > 1f) {
-            discoTimer = 0;
+        if (discoTimer >= clicksporbatida) {
+            discoTimer -= clicksporbatida;
             criarDiscos();
         }
     
