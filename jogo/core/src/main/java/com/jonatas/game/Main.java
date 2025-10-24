@@ -6,8 +6,10 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -40,6 +42,12 @@ public class Main implements ApplicationListener {
 
     Vector2 touchPos;
 
+    //Animação
+    Animation<TextureRegion> animacaoIdle;
+    TextureRegion frameAtual;
+    float posY, posX;
+    float stateTimeIdle;
+
     @Override
     public void create() {
         // ------ Carregando imagens
@@ -54,6 +62,18 @@ public class Main implements ApplicationListener {
         // ------ Iniciando SpriteBatch
         spriteBatch = new SpriteBatch();
         viewport = new FitViewport(12, 8);
+
+        // ------ Animações
+        TextureRegion[] framesIdle = new TextureRegion[4];
+        for(int i=0; i< 4;i++){
+            Texture t = new Texture("player-idle-"+(i+1)+".png");
+            framesIdle[i] = new TextureRegion(t);
+        }
+        animacaoIdle = new Animation<>(0.1f, framesIdle);
+        frameAtual = framesIdle[0];
+        posX = 0;
+        posY = 0;
+        float stateTime = 0f;
 
         //Capturando informações de click
         touchPos = new Vector2();
@@ -150,8 +170,16 @@ public class Main implements ApplicationListener {
                 discoAcertoSound.play();
             }
         }
-        float bpm = 240f;
-        float clicksporbatida = 60f / bpm;
+
+        stateTimeIdle += delta;
+        frameAtual = animacaoIdle.getKeyFrame(stateTimeIdle, true);
+        float bpm = 138f; //Cada batida  é uma nota inteira Seminima
+        float segundosporbatida = 60f / bpm;
+        float clicksporbatida = segundosporbatida / 2f;      //Colcheia 2 clcks
+        // float clicksporbatida = segundosporbatida / 4f;      //Semicolcheia 4 clicks
+        // float clicksporbatida = segundosporbatida / 8f;      //Fusa 8 clicks
+        // float clicksporbatida = segundosporbatida / 16f;      //SemiFusa 16 clis
+      
         discoTimer += delta;
         if (discoTimer >= clicksporbatida) {
             discoTimer -= clicksporbatida;
@@ -168,11 +196,13 @@ public class Main implements ApplicationListener {
         // ----- Desenhar as coisas é por aqui
         spriteBatch.begin();
 
-        spriteBatch.draw(fundoExemplo, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
-        personagemPrincipalSprite.draw(spriteBatch);
-        for (Sprite disco : vetorDiscos){
-            disco.draw(spriteBatch);
-        }
+            spriteBatch.draw(fundoExemplo, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+            personagemPrincipalSprite.draw(spriteBatch);
+            for (Sprite disco : vetorDiscos){
+                disco.draw(spriteBatch);
+            }
+            spriteBatch.draw(frameAtual,posX,posY,2,2 );
+
 
         spriteBatch.end();
     }
