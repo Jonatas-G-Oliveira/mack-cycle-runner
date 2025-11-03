@@ -46,6 +46,7 @@ public class Main implements ApplicationListener {
     Animation<TextureRegion> animacaoIdle;
     TextureRegion frameAtual;
     float posY, posX;
+    float cachorroLargura, cachorroAltura;
     float stateTimeIdle;
 
     @Override
@@ -71,8 +72,10 @@ public class Main implements ApplicationListener {
         }
         animacaoIdle = new Animation<>(0.1f, framesIdle);
         frameAtual = framesIdle[0];
-        posX = 0;
-        posY = 0;
+        posX = 1;
+        posY = 2;
+        cachorroAltura = 2;
+        cachorroLargura = 2;
         float stateTime = 0f;
 
         //Capturando informações de click
@@ -135,7 +138,9 @@ public class Main implements ApplicationListener {
             touchPos.set(Gdx.input.getX(), Gdx.input.getY()); //Pegando informações de onde foi clicado>>>>>
             if (inverterPosicao) {
                 personagemPrincipalSprite.translateY(velocidade);
+                posY = 4;
             }else{
+                posY= 1;
                 personagemPrincipalSprite.translateY(-velocidade);
             }
             inverterPosicao = !inverterPosicao;
@@ -153,8 +158,8 @@ public class Main implements ApplicationListener {
         personagemPrincipalSprite.setY(MathUtils.clamp(personagemPrincipalSprite.getY(), 1, worldHeight - personagemPrincipalHeight));
 
         // Hitbox Personagem Principal
-        PersonagemRectangle.set(personagemPrincipalSprite.getX(), personagemPrincipalSprite.getY(), personagemPrincipalWidth, personagemPrincipalHeight);
-
+        // PersonagemRectangle.set(personagemPrincipalSprite.getX(), personagemPrincipalSprite.getY(), personagemPrincipalWidth, personagemPrincipalHeight);
+        PersonagemRectangle.set(posX, posY, cachorroLargura, cachorroAltura);
         for (int i = vetorDiscos.size - 1; i >= 0; i--){
             Sprite disco = vetorDiscos.get(i);
             float discoWidth = disco.getWidth();
@@ -163,12 +168,46 @@ public class Main implements ApplicationListener {
             disco.translateX(-4f * delta);
             discoRectangle.set(disco.getX(), disco.getY(), discoWidth, discoHeight);
 
+            //
             if(disco.getX() < -discoWidth){
                 vetorDiscos.removeIndex(i);
-            }else if(discoRectangle.overlaps(PersonagemRectangle)){
-                vetorDiscos.removeIndex(i);
-                discoAcertoSound.play();
             }
+            //colisão
+            // else if(discoRectangle.overlaps(PersonagemRectangle)){
+            //     vetorDiscos.removeIndex(i);
+            //     discoAcertoSound.play();
+            // }
+            //nova colisão
+            float tolerancia = 0.3f;
+            float personagemCentralX = PersonagemRectangle.x + PersonagemRectangle.width / 2f;
+            float personagemCentralY = PersonagemRectangle.y + PersonagemRectangle.height / 2f; 
+
+            float discoCentroX = discoRectangle.x + discoRectangle.width / 2f ;
+            float discoCentroY = discoRectangle.y + discoRectangle.height / 2f;
+
+            float diferencaX = Math.abs(discoCentroX - personagemCentralX);
+            float diferencaY = Math.abs(discoCentroY - personagemCentralY);
+            // if( < tolerancia && Math.abs(discoCentroY - personagemCentralY) < tolerancia ){
+            //     vetorDiscos.removeIndex(i);
+            //     discoAcertoSound.play();
+            //    } 
+            if (diferencaY < 0.5f) { //Verifica se esta na mesma esteira
+                if (diferencaX < 0.1f){
+                    System.out.println("Perfeito");
+                    vetorDiscos.removeIndex(i);
+                    discoAcertoSound.play(1.0f);
+                }
+                else if(diferencaX < 0.25){
+                    System.out.println("Bom");
+                    vetorDiscos.removeIndex(i);
+                    discoAcertoSound.play(1.0f);
+                }else if(diferencaX < 0.4){
+                    System.out.println("Quase");
+                    vetorDiscos.removeIndex(i);
+                    discoAcertoSound.play(1.0f);
+                }
+            }
+               
         }
 
         stateTimeIdle += delta;
@@ -197,11 +236,11 @@ public class Main implements ApplicationListener {
         spriteBatch.begin();
 
             spriteBatch.draw(fundoExemplo, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
-            personagemPrincipalSprite.draw(spriteBatch);
+            // personagemPrincipalSprite.draw(spriteBatch);
             for (Sprite disco : vetorDiscos){
                 disco.draw(spriteBatch);
             }
-            spriteBatch.draw(frameAtual,posX,posY,2,2 );
+            spriteBatch.draw(frameAtual,posX,posY,cachorroAltura,cachorroLargura);
 
 
         spriteBatch.end();
