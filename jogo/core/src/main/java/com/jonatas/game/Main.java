@@ -2,9 +2,15 @@ package com.jonatas.game;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -13,12 +19,30 @@ public class Main implements ApplicationListener {
     SpriteBatch spriteBatch;
     FitViewport viewport;
 
+    //Criação dos disco
     Array<Disco> vetorDiscos;
     Texture discoTexture;
     float discoTimer;
 
     private Dog dog;
     
+    // ----- Efeitos sonoros
+    Sound somAcerto;
+    Music musicaFase1;
+
+    // ----- UI
+    private float barraValor;
+    private int score;
+    private Stage uiStage;
+    private Label scoreLabel;
+    private BitmapFont font;
+    
+    // Elementos visuais
+    private ShapeRenderer shapeRenderer;
+    private String feedback;
+    private float feedbackTimer;
+
+    private Label feedbackLabel;
 
     @Override
     public void create() {
@@ -31,7 +55,31 @@ public class Main implements ApplicationListener {
         discoTexture = new Texture("disco.jpg");
         vetorDiscos = new Array<>();
         
+        // ----- Efeitos Sonoros
+        somAcerto = Gdx.audio.newSound(Gdx.files.internal("hit.wav"));
+        musicaFase1 = Gdx.audio.newMusic(Gdx.files.internal("bankai.mp3"));
+        musicaFase1.setVolume(.5f);
+        musicaFase1.play();
+
+        // ----- UI
+        score = 0;
+        uiStage = new Stage();
+        font = new BitmapFont();
+        Label.LabelStyle style = new Label.LabelStyle(font, Color.WHITE);
         
+        scoreLabel = new Label("Pontuação: " + score, style);
+        feedbackLabel = new Label(feedback, style);
+
+        scoreLabel.setPosition(20, 440);
+        feedbackLabel.setPosition(250, 250);
+        uiStage.addActor(scoreLabel);
+        uiStage.addActor(feedbackLabel);
+
+        // ------ Elementos visuais
+        barraValor = 0f;
+        shapeRenderer = new ShapeRenderer();
+        feedback = "";
+        feedbackTimer = 0f;
     }
 
     @Override
@@ -44,42 +92,58 @@ public class Main implements ApplicationListener {
     public void render() {
         float dt = Gdx.graphics.getDeltaTime();
 
-        updateGameObjects(dt); //Novo logic
-        handleCollisions();
         criarDiscos(dt);
+        updateGameObjects(dt); //Novo logic
         drawGameObjects();
+        drawUI();
+        
 
         //TO DO
         //CRIAR UI
     }
 
     
-    //novo Logic -reponsável por mover as paradas
+    //novo Logic - reponsável por mover as paradas
     public void updateGameObjects(float dt){
         dog.update(dt);
         
-        //colisão
         for (int i = vetorDiscos.size - 1; i >= 0; i--){
             Disco disco = vetorDiscos.get(i);
             disco.update(dt);
+
+            //Disco saindo da tela
             if(disco.getHitbox().x < -disco.getHitbox().width){
                 vetorDiscos.removeIndex(i);
+                barraValor -=  0.2f;
+                if (barraValor < 0f) barraValor = 0;
             }
-        }
-    }
 
-    private void handleCollisions() {
-        for (int i = vetorDiscos.size - 1; i >= 0; i--) {
-            Disco disco = vetorDiscos.get(i);
-             if (disco.getHitbox().overlaps(dog.getHitbox())){
+            //Disco sendo acertado
+            if (disco.getHitbox().overlaps(dog.getHitbox())){
+                somAcerto.play();
                 vetorDiscos.removeIndex(i);
-                System.out.println("Acertou miseravi!");
+                score += 10;
+                barraValor += 0.2f;
+                if (barraValor > 1f) barraValor = 1f;// O máximo é 1
+                feedback = "PERFEITO!";
+                feedbackTimer = 1f;
+
+                feedbackLabel.setText(feedback);
+                scoreLabel.setText("Pontuação: " + score);
             }
 
-            //TO DO 
-            //INSERIR PONTUAÇÃO E SOM
         }
+
+        // Decaimento do feedback 
+        if (feedbackTimer > 0) {
+            feedbackTimer -= dt;
+            if (feedbackTimer <= 0){
+                feedback = "";
+                feedbackLabel.setText(feedback);
+            } 
+}
     }
+
 
     private void criarDiscos(float dt){
         discoTimer += dt;
@@ -105,9 +169,30 @@ public class Main implements ApplicationListener {
                 disco.draw(spriteBatch);
             }
         spriteBatch.end();
+
+        // Desenhando a barra de progresso
+        shapeRenderer.setProjectionMatrix(viewport.getCamera().combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+            // Fundo da barra (purple)
+            shapeRenderer.setColor(Color.CORAL);
+            shapeRenderer.rect(4f, 0.5f, 4f, 0.4f);
+
+            // Barra preenchida (pink)
+            shapeRenderer.setColor(Color.PINK);
+            shapeRenderer.rect(4f, 0.5f, 4f * barraValor, 0.4f);
+
+        shapeRenderer.end();
+   
+        }
+
+    
+    private void drawUI(){
+        uiStage.act();
+        uiStage.draw();
     }
 
-      @Override
+    @Override
     public void pause() {
     }
 
@@ -116,9 +201,9 @@ public class Main implements ApplicationListener {
     }
 
     // TO DO 
-    // IMPLEMENTAR UI E DISPOSE
+    // E DISPOSE
     @Override
     public void dispose() {
-
+        // spriteBatch.dispose();
     }
 }
