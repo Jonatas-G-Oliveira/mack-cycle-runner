@@ -1,7 +1,8 @@
-package com.jonatas.game;
+package com.jonatas.game.screens;
 
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
@@ -14,8 +15,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.jonatas.game.MyGame;
+import com.jonatas.game.objetos.Disco;
+import com.jonatas.game.objetos.Dog;
 
-public class Main implements ApplicationListener {    
+
+//Deixar as musicas fora daqui
+public class Fase1 implements Screen {
+    
+    private MyGame game;
     SpriteBatch spriteBatch;
     FitViewport viewport;
 
@@ -44,8 +52,9 @@ public class Main implements ApplicationListener {
 
     private Label feedbackLabel;
 
-    @Override
-    public void create() {
+    public Fase1(MyGame game){
+        this.game = game;
+
         // ------ Iniciando SpriteBatch
         spriteBatch = new SpriteBatch();
         viewport = new FitViewport(12, 8);
@@ -59,7 +68,7 @@ public class Main implements ApplicationListener {
         somAcerto = Gdx.audio.newSound(Gdx.files.internal("hit.wav"));
         musicaFase1 = Gdx.audio.newMusic(Gdx.files.internal("bankai.mp3"));
         musicaFase1.setVolume(.5f);
-        musicaFase1.play();
+        
 
         // ----- UI
         score = 0;
@@ -83,13 +92,7 @@ public class Main implements ApplicationListener {
     }
 
     @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height,true);
-    }
-
-
-    @Override
-    public void render() {
+    public void render(float delta) {
         float dt = Gdx.graphics.getDeltaTime();
 
         criarDiscos(dt);
@@ -97,12 +100,13 @@ public class Main implements ApplicationListener {
         drawGameObjects();
         drawUI();
         
+        // Aqui vai toda a lógica da fase 1 (dog, discos, UI…)
 
-        //TO DO
-        //CRIAR UI
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+                game.setScreen(new MenuScreen(game));
+        }
     }
 
-    
     //novo Logic - reponsável por mover as paradas
     public void updateGameObjects(float dt){
         dog.update(dt);
@@ -191,19 +195,22 @@ public class Main implements ApplicationListener {
         uiStage.act();
         uiStage.draw();
     }
-
+    
     @Override
-    public void pause() {
+    public void resize(int width, int height) {
+        viewport.update(width, height, true);
     }
+    @Override public void show() {
 
-    @Override
-    public void resume() {
+        musicaFase1.play();
     }
+    @Override public void hide() {
+            musicaFase1.stop();
+    }
+    @Override public void pause() {}
+    @Override public void resume() {}
+    @Override public void dispose() {
+        musicaFase1.dispose();
 
-    // TO DO 
-    // E DISPOSE
-    @Override
-    public void dispose() {
-        // spriteBatch.dispose();
     }
 }

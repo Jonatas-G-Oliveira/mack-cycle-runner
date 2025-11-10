@@ -1,4 +1,4 @@
-package com.jonatas.game;
+package com.jonatas.game.objetos;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
