@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
@@ -33,6 +34,7 @@ public class Fase1 implements Screen {
     float discoTimer;
 
     private Dog dog;
+    Texture fundo;
     
     // ----- Efeitos sonoros
     Sound somAcerto;
@@ -51,6 +53,7 @@ public class Fase1 implements Screen {
     private float feedbackTimer;
 
     private Label feedbackLabel;
+    private final float[] esteira = {1 , 4};
 
     public Fase1(MyGame game){
         this.game = game;
@@ -58,11 +61,13 @@ public class Fase1 implements Screen {
         // ------ Iniciando SpriteBatch
         spriteBatch = new SpriteBatch();
         viewport = new FitViewport(12, 8);
+        // fundo = new Texture("fundo_ex.jpeg");
 
         // ------ Elementos do jogo
         dog = new Dog(1, 1, 2, 2, viewport);
         discoTexture = new Texture("disco.jpg");
         vetorDiscos = new Array<>();
+        
         
         // ----- Efeitos Sonoros
         somAcerto = Gdx.audio.newSound(Gdx.files.internal("hit.wav"));
@@ -121,20 +126,66 @@ public class Fase1 implements Screen {
                 barraValor -=  0.2f;
                 if (barraValor < 0f) barraValor = 0;
             }
+            //Implementar a colisão certa
+            // float tolerancia = 0.3f;
+            // float personagemCentralX = .x + PersonagemRectangle.width / 2f;
+            // float personagemCentralY = PersonagemRectangle.y + PersonagemRectangle.height / 2f; 
+
+            // float discoCentroX = discoRectangle.x + discoRectangle.width / 2f ;
+            // float discoCentroY = discoRectangle.y + discoRectangle.height / 2f;
+
+            // float diferencaX = Math.abs(discoCentroX - personagemCentralX);
+            // float diferencaY = Math.abs(discoCentroY - personagemCentralY);
+            // if( < tolerancia && Math.abs(discoCentroY - personagemCentralY) < tolerancia ){
+            //     vetorDiscos.removeIndex(i);
+            //     discoAcertoSound.play();
+            //    } 
 
             //Disco sendo acertado
-            if (disco.getHitbox().overlaps(dog.getHitbox())){
-                somAcerto.play();
-                vetorDiscos.removeIndex(i);
-                score += 10;
-                barraValor += 0.2f;
-                if (barraValor > 1f) barraValor = 1f;// O máximo é 1
-                feedback = "PERFEITO!";
-                feedbackTimer = 1f;
+                    
+            float diferencaY = Math.abs(disco.getHitbox().y - dog.getHitbox().y);
+            float diferencaX =  Math.abs(disco.getHitbox().x - dog.getHitbox().x);
+            if(diferencaY < 0.5 && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){ //Verifica se esta na mesma esteira
+                if (diferencaX < 0.5f){
+                    score += 10;
+                    feedback = "PERFEITO!";
+                    somAcerto.play();
+                    vetorDiscos.removeIndex(i);
+                    barraValor += 0.3f;
+                    if (barraValor > 1f) barraValor = 1f;
+                     feedbackTimer = 1f;
 
-                feedbackLabel.setText(feedback);
-                scoreLabel.setText("Pontuação: " + score);
+                    feedbackLabel.setText(feedback);
+                    scoreLabel.setText("Pontuação: " + score);
+                }else if(diferencaX < 1.2f){
+                    score += 10;
+                    feedback = "BOM!";
+                    somAcerto.play();
+                    vetorDiscos.removeIndex(i);
+                    barraValor += 0.1f;
+                    
+                    if (barraValor > 1f) barraValor = 1f;
+                    feedbackTimer = 1f;
+
+                    feedbackLabel.setText(feedback);
+                    scoreLabel.setText("Pontuação: " + score);
+                }
             }
+           
+            
+
+            // if (disco.getHitbox().overlaps(dog.getHitbox())){
+            //     somAcerto.play();
+            //     vetorDiscos.removeIndex(i);
+            //     score += 10;
+            //     barraValor += 0.2f;
+            //     if (barraValor > 1f) barraValor = 1f;// O máximo é 1
+            //     feedback = "PERFEITO!";
+            //     feedbackTimer = 0.5f;
+
+            //     feedbackLabel.setText(feedback);
+            //     scoreLabel.setText("Pontuação: " + score);
+            // }
 
         }
 
@@ -151,9 +202,18 @@ public class Fase1 implements Screen {
 
     private void criarDiscos(float dt){
         discoTimer += dt;
-        if (discoTimer > 1f){
-            discoTimer = 0;
-            Disco novoDisco =  new Disco(discoTexture, 12, 4, 2, 2, viewport);
+        
+        float bpm = 138f; //Cada batida  é uma nota inteira Seminima
+        float segundosporbatida = 60f / bpm;
+        float clicksporbatida = segundosporbatida / 2f;      //Colcheia 2 clcks
+        // float clicksporbatida = segundosporbatida / 4f;      //Semicolcheia 4 clicks
+        // float clicksporbatida = segundosporbatida / 8f;      //Fusa 8 clicks
+        // float clicksporbatida = segundosporbatida / 16f;      //SemiFusa 16 clis
+        if (discoTimer > clicksporbatida){
+            discoTimer -=  clicksporbatida;
+            int pos = MathUtils.random(0, esteira.length - 1);
+            float y = esteira[pos];
+            Disco novoDisco =  new Disco(discoTexture, 12, y, 2, 2, viewport);
             vetorDiscos.add(novoDisco);
         }
         
@@ -168,6 +228,7 @@ public class Fase1 implements Screen {
 
         
         spriteBatch.begin();
+            // spriteBatch.draw(fundo,0,0, viewport.getWorldWidth(), viewport.getWorldHeight());
             dog.draw(spriteBatch);
             for (Disco disco : vetorDiscos){
                 disco.draw(spriteBatch);

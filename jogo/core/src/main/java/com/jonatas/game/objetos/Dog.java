@@ -1,6 +1,7 @@
 package com.jonatas.game.objetos;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -47,20 +48,17 @@ public class Dog extends GameObject{
     @Override
     public void update(float delta){
         float velocidade = 3f;
-         //rodar em qualquer lugar
 
-
-        if(Gdx.input.justTouched()){
-            touchPos.set(Gdx.input.getX(), Gdx.input.getY()); //Pegando informações de onde foi clicado>>>>>
-            if (inverterPosicao) {
-                sprite.translateY(velocidade);
-                posY = 4;
-            }else{
-                posY= 1;
-                sprite.translateY(-velocidade);
-            }
-            inverterPosicao = !inverterPosicao;
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+            posY = 1;
+            sprite.setY(posY);
         }
+
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            posY = 4;
+            sprite.setY(posY);  
+        }
+        
         stateTimeIdle += delta;
         frameAtual = animacaoIdle.getKeyFrame(stateTimeIdle, true);
         // Garante que o jogador não saia da tela
