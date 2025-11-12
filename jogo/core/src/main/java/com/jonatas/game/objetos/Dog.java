@@ -41,7 +41,7 @@ public class Dog extends GameObject{
         }
         animacaoIdle = new Animation<>(0.1f, framesIdle);
         frameAtual = framesIdle[0];
-        float stateTimeIdle = 0f;
+        stateTimeIdle = 0f;
     }
 
 

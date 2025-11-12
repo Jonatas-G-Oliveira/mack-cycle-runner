@@ -15,10 +15,11 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.jonatas.game.MyGame;
 import com.jonatas.game.objetos.Disco;
 import com.jonatas.game.objetos.Dog;
+import com.jonatas.game.objetos.Inimigo;
 
 
 //Deixar as musicas fora daqui
@@ -26,7 +27,7 @@ public class Fase1 implements Screen {
     
     private MyGame game;
     SpriteBatch spriteBatch;
-    FitViewport viewport;
+    ExtendViewport viewport;
 
     //Criação dos disco
     Array<Disco> vetorDiscos;
@@ -34,6 +35,7 @@ public class Fase1 implements Screen {
     float discoTimer;
 
     private Dog dog;
+    private Inimigo inimigo;
     Texture fundo;
     
     // ----- Efeitos sonoros
@@ -60,11 +62,12 @@ public class Fase1 implements Screen {
 
         // ------ Iniciando SpriteBatch
         spriteBatch = new SpriteBatch();
-        viewport = new FitViewport(12, 8);
-        // fundo = new Texture("fundo_ex.jpeg");
+        viewport = new ExtendViewport(12, 8);
+        fundo = new Texture("zootopia_fundo.jpg");
 
         // ------ Elementos do jogo
         dog = new Dog(1, 1, 2, 2, viewport);
+        inimigo = new Inimigo(9, 4, 3, 3, viewport);
         discoTexture = new Texture("disco.jpg");
         vetorDiscos = new Array<>();
         
@@ -115,49 +118,38 @@ public class Fase1 implements Screen {
     //novo Logic - reponsável por mover as paradas
     public void updateGameObjects(float dt){
         dog.update(dt);
-        
+        inimigo.update(dt);
         for (int i = vetorDiscos.size - 1; i >= 0; i--){
             Disco disco = vetorDiscos.get(i);
             disco.update(dt);
 
-            //Disco saindo da tela
+            // ------ Disco saindo da tela
             if(disco.getHitbox().x < -disco.getHitbox().width){
                 vetorDiscos.removeIndex(i);
                 barraValor -=  0.2f;
                 if (barraValor < 0f) barraValor = 0;
             }
-            //Implementar a colisão certa
-            // float tolerancia = 0.3f;
-            // float personagemCentralX = .x + PersonagemRectangle.width / 2f;
-            // float personagemCentralY = PersonagemRectangle.y + PersonagemRectangle.height / 2f; 
-
-            // float discoCentroX = discoRectangle.x + discoRectangle.width / 2f ;
-            // float discoCentroY = discoRectangle.y + discoRectangle.height / 2f;
-
-            // float diferencaX = Math.abs(discoCentroX - personagemCentralX);
-            // float diferencaY = Math.abs(discoCentroY - personagemCentralY);
-            // if( < tolerancia && Math.abs(discoCentroY - personagemCentralY) < tolerancia ){
-            //     vetorDiscos.removeIndex(i);
-            //     discoAcertoSound.play();
-            //    } 
-
-            //Disco sendo acertado
-                    
+            
+            // ------ Disco sendo acertado
             float diferencaY = Math.abs(disco.getHitbox().y - dog.getHitbox().y);
-            float diferencaX =  Math.abs(disco.getHitbox().x - dog.getHitbox().x);
+
+            float discoCentroX = disco.getHitbox().x + disco.getHitbox().width / 2f;
+            float dogCentroX = dog.getHitbox().x + dog.getHitbox().width / 2f;
+            float diferencaX =  discoCentroX - dogCentroX;
             if(diferencaY < 0.5 && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){ //Verifica se esta na mesma esteira
-                if (diferencaX < 0.5f){
+                if (diferencaX >= -0.7f && diferencaX < 0.5f){
                     score += 10;
                     feedback = "PERFEITO!";
                     somAcerto.play();
                     vetorDiscos.removeIndex(i);
                     barraValor += 0.3f;
                     if (barraValor > 1f) barraValor = 1f;
-                     feedbackTimer = 1f;
-
+                     
+                    feedbackTimer = 0.5f;
                     feedbackLabel.setText(feedback);
                     scoreLabel.setText("Pontuação: " + score);
-                }else if(diferencaX < 1.2f){
+                    break;
+                }else if(diferencaX >= 0.5f && diferencaX < 1.2f){
                     score += 10;
                     feedback = "BOM!";
                     somAcerto.play();
@@ -165,28 +157,13 @@ public class Fase1 implements Screen {
                     barraValor += 0.1f;
                     
                     if (barraValor > 1f) barraValor = 1f;
-                    feedbackTimer = 1f;
+                    feedbackTimer = 0.5f;
 
                     feedbackLabel.setText(feedback);
                     scoreLabel.setText("Pontuação: " + score);
+                    break;
                 }
             }
-           
-            
-
-            // if (disco.getHitbox().overlaps(dog.getHitbox())){
-            //     somAcerto.play();
-            //     vetorDiscos.removeIndex(i);
-            //     score += 10;
-            //     barraValor += 0.2f;
-            //     if (barraValor > 1f) barraValor = 1f;// O máximo é 1
-            //     feedback = "PERFEITO!";
-            //     feedbackTimer = 0.5f;
-
-            //     feedbackLabel.setText(feedback);
-            //     scoreLabel.setText("Pontuação: " + score);
-            // }
-
         }
 
         // Decaimento do feedback 
@@ -213,7 +190,7 @@ public class Fase1 implements Screen {
             discoTimer -=  clicksporbatida;
             int pos = MathUtils.random(0, esteira.length - 1);
             float y = esteira[pos];
-            Disco novoDisco =  new Disco(discoTexture, 12, y, 2, 2, viewport);
+            Disco novoDisco =  new Disco( 9, y, 2, 2, viewport);
             vetorDiscos.add(novoDisco);
         }
         
@@ -228,8 +205,9 @@ public class Fase1 implements Screen {
 
         
         spriteBatch.begin();
-            // spriteBatch.draw(fundo,0,0, viewport.getWorldWidth(), viewport.getWorldHeight());
+            spriteBatch.draw(fundo,0,0, viewport.getWorldWidth(), viewport.getWorldHeight());
             dog.draw(spriteBatch);
+            inimigo.draw(spriteBatch);
             for (Disco disco : vetorDiscos){
                 disco.draw(spriteBatch);
             }
