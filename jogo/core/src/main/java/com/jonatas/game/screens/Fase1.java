@@ -1,5 +1,4 @@
 package com.jonatas.game.screens;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -24,7 +23,8 @@ import com.jonatas.game.objetos.Inimigo;
 
 //Deixar as musicas fora daqui
 public class Fase1 implements Screen {
-    
+    private int discosPerdidosSeguidos = 0;
+
     private MyGame game;
     SpriteBatch spriteBatch;
     FitViewport viewport;
@@ -145,8 +145,16 @@ public class Fase1 implements Screen {
             // ------ Disco saindo da tela
             if(disco.getHitbox().x < -disco.getHitbox().width){
                 vetorDiscos.removeIndex(i);
+                discosPerdidosSeguidos++;
                 barraValor -=  0.2f;
                 if (barraValor < 0f) barraValor = 0;
+            }
+
+              // verifica game over
+            if (discosPerdidosSeguidos >= 5) {
+                // game.setScreen(new GameOverScreen(game, score));
+            
+                return;
             }
             
             // ------ Disco sendo acertado
@@ -157,6 +165,7 @@ public class Fase1 implements Screen {
             float diferencaX =  discoCentroX - dogCentroX;
             if(diferencaY < 0.5 && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){ //Verifica se esta na mesma esteira
                 if (diferencaX >= -0.7f && diferencaX < 0.5f){
+                    discosPerdidosSeguidos = 0;
                     score += 10;
                     feedback = "PERFEITO!";
                     somAcerto.play();
@@ -169,6 +178,7 @@ public class Fase1 implements Screen {
                     scoreLabel.setText("Pontuação: " + score);
                     break;
                 }else if(diferencaX >= 0.5f && diferencaX < 1.2f){
+                    discosPerdidosSeguidos = 0;
                     score += 10;
                     feedback = "BOM!";
                     somAcerto.play();
