@@ -16,11 +16,21 @@ public class Dog extends GameObject{
     private Viewport viewport;
     private boolean inverterPosicao;
     private float posX, posY;
+    private boolean pulando = false;
+    private boolean descendo = false;
 
     //Animação
+    private Animation<TextureRegion> animacaoAtual;
     Animation<TextureRegion> animacaoIdle;
+    Animation<TextureRegion> animacaoCima;
+    Animation<TextureRegion> animacaoBaixo;
     TextureRegion frameAtual;
     float stateTimeIdle;
+
+    
+
+
+
 
     //Usando o construtor dinãmico
     public Dog(float x, float y, float largura, float altura, Viewport viewport){
@@ -34,12 +44,26 @@ public class Dog extends GameObject{
     }
 
     private void carregarAnimacoes(){
+        // ---------- IDLE ----------
         TextureRegion[] framesIdle = new TextureRegion[4];
         for(int i=0; i< 4;i++){
             Texture t = new Texture("player-idle-"+(i+1)+".png");
             framesIdle[i] = new TextureRegion(t);
         }
         animacaoIdle = new Animation<>(0.1f, framesIdle);
+
+        // ---------- ANIMAÇÃO CIMA ----------
+        TextureRegion[] framesCima = new TextureRegion[1];
+        framesCima[0] = new TextureRegion(new Texture("player-jump-1.png"));
+        animacaoCima = new Animation<>(0.2f, framesCima);
+
+        // ---------- ANIMAÇÃO BAIXO ----------
+        TextureRegion[] framesBaixo = new TextureRegion[1];
+        framesBaixo[0] = new TextureRegion(new Texture("player-jump-2.png"));
+        animacaoBaixo = new Animation<>(0.4f, framesBaixo);
+
+        
+        animacaoAtual = animacaoIdle;
         frameAtual = framesIdle[0];
         stateTimeIdle = 0f;
     }
@@ -47,23 +71,55 @@ public class Dog extends GameObject{
 
     @Override
     public void update(float delta){
-        float velocidade = 3f;
-
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
-            posY = 1;
-            sprite.setY(posY);
-        }
-
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-            posY = 4;
-            sprite.setY(posY);  
-        }
-        
-        stateTimeIdle += delta;
-        frameAtual = animacaoIdle.getKeyFrame(stateTimeIdle, true);
-        // Garante que o jogador não saia da tela
-        sprite.setY(MathUtils.clamp(sprite.getY(), 1, 12 - 2));
+    // processa input e inicia animação, se aplicável
+    if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && !pulando) {
+        // pular (ir pra cima)
+        pulando = true;
+        descendo = false;
+        animacaoAtual = animacaoCima;
+        stateTimeIdle = 0f;      // reset pra começar a animação do início
+        posY = 4;
+        sprite.setY(posY);
     }
+
+    if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT) && !descendo) {
+        // descer (ir pra baixo)
+        descendo = true;
+        pulando = false;
+        animacaoAtual = animacaoBaixo;
+        stateTimeIdle = 0f;
+        posY = 1;
+        sprite.setY(posY);
+    }
+
+    // avança tempo da animação atual
+    stateTimeIdle += delta;
+
+    // atualiza frame de acordo com o estado atual (prioridade: pulando -> descendo -> idle)
+    if (pulando) {
+        frameAtual = animacaoCima.getKeyFrame(stateTimeIdle, false);
+        if (animacaoCima.isAnimationFinished(stateTimeIdle)) {
+            pulando = false;
+            animacaoAtual = animacaoIdle;
+            stateTimeIdle = 0f;
+            frameAtual = animacaoIdle.getKeyFrame(0f, true);
+        }
+    } else if (descendo) {
+        frameAtual = animacaoBaixo.getKeyFrame(stateTimeIdle, false);
+        if (animacaoBaixo.isAnimationFinished(stateTimeIdle)) {
+            descendo = false;
+            animacaoAtual = animacaoIdle;
+            stateTimeIdle = 0f;
+            frameAtual = animacaoIdle.getKeyFrame(0f, true);
+        }
+    } else {
+        // idle (looping)
+        frameAtual = animacaoIdle.getKeyFrame(stateTimeIdle, true);
+    }
+
+    // garante que o jogador não saia da tela
+    sprite.setY(MathUtils.clamp(sprite.getY(), 1, 12 - 2));
+}
 
     @Override
     public void draw(SpriteBatch batch) {

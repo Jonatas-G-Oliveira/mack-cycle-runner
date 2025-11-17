@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.jonatas.game.MyGame;
 import com.jonatas.game.objetos.Disco;
 import com.jonatas.game.objetos.Dog;
@@ -27,7 +27,7 @@ public class Fase1 implements Screen {
     
     private MyGame game;
     SpriteBatch spriteBatch;
-    ExtendViewport viewport;
+    FitViewport viewport;
 
     //Criação dos disco
     Array<Disco> vetorDiscos;
@@ -36,7 +36,7 @@ public class Fase1 implements Screen {
 
     private Dog dog;
     private Inimigo inimigo;
-    Texture fundo;
+   
     
     // ----- Efeitos sonoros
     Sound somAcerto;
@@ -57,17 +57,28 @@ public class Fase1 implements Screen {
     private Label feedbackLabel;
     private final float[] esteira = {1 , 4};
 
+    // Parallax
+    Texture fundo;
+    float fundoX = 0f;
+    float velocidadeFundo = 1.5f;
+
     public Fase1(MyGame game){
         this.game = game;
 
         // ------ Iniciando SpriteBatch
         spriteBatch = new SpriteBatch();
-        viewport = new ExtendViewport(12, 8);
-        fundo = new Texture("zootopia_fundo.jpg");
+        viewport = new FitViewport(16, 9);
+        fundo = new Texture("zootopia_gemini.png");
+
+        //Ajuste pra imagem
+        float bgAspect = (float) fundo.getWidth() / fundo.getHeight();
+        float screenAspect = viewport.getWorldWidth() / viewport.getWorldHeight();
+        float drawHeight = viewport.getWorldHeight();
+        float drawWidth  = drawHeight * bgAspect;
 
         // ------ Elementos do jogo
-        dog = new Dog(1, 1, 2, 2, viewport);
-        inimigo = new Inimigo(9, 4, 3, 3, viewport);
+        dog = new Dog(2, 1, 2, 2, viewport);
+        inimigo = new Inimigo(13, 4, 3, 3, viewport);
         discoTexture = new Texture("disco.jpg");
         vetorDiscos = new Array<>();
         
@@ -82,12 +93,14 @@ public class Fase1 implements Screen {
         score = 0;
         uiStage = new Stage();
         font = new BitmapFont();
-        Label.LabelStyle style = new Label.LabelStyle(font, Color.WHITE);
-        
-        scoreLabel = new Label("Pontuação: " + score, style);
-        feedbackLabel = new Label(feedback, style);
+        font.getData().setScale(2.0f);
+        Label.LabelStyle style = new Label.LabelStyle(font, Color.GREEN);
+        Label.LabelStyle style_feedback = new Label.LabelStyle(font, Color.PURPLE);
 
-        scoreLabel.setPosition(20, 440);
+        scoreLabel = new Label("Pontuação: " + score, style);
+        feedbackLabel = new Label(feedback, style_feedback);
+
+        scoreLabel.setPosition(120, Gdx.graphics.getHeight() - 60 ); // distância do topo;
         feedbackLabel.setPosition(250, 250);
         uiStage.addActor(scoreLabel);
         uiStage.addActor(feedbackLabel);
@@ -119,6 +132,12 @@ public class Fase1 implements Screen {
     public void updateGameObjects(float dt){
         dog.update(dt);
         inimigo.update(dt);
+        fundoX -= velocidadeFundo * dt;
+
+        if (fundoX <= -viewport.getWorldWidth()) {
+                fundoX += viewport.getWorldWidth();
+        }
+
         for (int i = vetorDiscos.size - 1; i >= 0; i--){
             Disco disco = vetorDiscos.get(i);
             disco.update(dt);
@@ -190,7 +209,7 @@ public class Fase1 implements Screen {
             discoTimer -=  clicksporbatida;
             int pos = MathUtils.random(0, esteira.length - 1);
             float y = esteira[pos];
-            Disco novoDisco =  new Disco( 9, y, 2, 2, viewport);
+            Disco novoDisco =  new Disco( 13, y, 2, 2, viewport);
             vetorDiscos.add(novoDisco);
         }
         
@@ -205,7 +224,9 @@ public class Fase1 implements Screen {
 
         
         spriteBatch.begin();
-            spriteBatch.draw(fundo,0,0, viewport.getWorldWidth(), viewport.getWorldHeight());
+            spriteBatch.draw(fundo, fundoX,0, viewport.getWorldWidth(), viewport.getWorldHeight());
+            spriteBatch.draw(fundo, fundoX + viewport.getWorldWidth(),0, viewport.getWorldWidth(), viewport.getWorldHeight());
+
             dog.draw(spriteBatch);
             inimigo.draw(spriteBatch);
             for (Disco disco : vetorDiscos){
@@ -219,11 +240,11 @@ public class Fase1 implements Screen {
 
             // Fundo da barra (purple)
             shapeRenderer.setColor(Color.CORAL);
-            shapeRenderer.rect(4f, 0.5f, 4f, 0.4f);
+            shapeRenderer.rect(6f, 0.5f, 4f, 0.4f);
 
             // Barra preenchida (pink)
-            shapeRenderer.setColor(Color.PINK);
-            shapeRenderer.rect(4f, 0.5f, 4f * barraValor, 0.4f);
+            shapeRenderer.setColor(Color.GREEN);
+            shapeRenderer.rect(6f, 0.5f, 4f * barraValor, 0.4f);
 
         shapeRenderer.end();
    
