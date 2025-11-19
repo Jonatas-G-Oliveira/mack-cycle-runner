@@ -20,11 +20,12 @@ import com.jonatas.game.objetos.Disco;
 import com.jonatas.game.objetos.Dog;
 import com.jonatas.game.objetos.Inimigo;
 
-// ------ Fase 2 você pode perder até 5 disco bpm medio 80
+
+// ------ Fase 3 você pode perder até 5 discos bpm medio 138
 // Trocar a música e  o fundo
 
 //Deixar as musicas fora daqui
-public class Fase2 implements Screen {
+public class Fase3 implements Screen {
     private int discosPerdidosSeguidos = 0;
 
     private MyGame game;
@@ -67,13 +68,13 @@ public class Fase2 implements Screen {
     float fundoX = 0f;
     float velocidadeFundo = 1.5f;
 
-    public Fase2(MyGame game){
+    public Fase3(MyGame game){
         this.game = game;
 
         // ------ Iniciando SpriteBatch
         spriteBatch = new SpriteBatch();
         viewport = new FitViewport(16, 9);
-        fundo = new Texture("zootopia_gemini_fase_2.png");
+        fundo = new Texture("zootopia_gemini_fase_3.png");
 
         //Ajuste pra imagem
         float bgAspect = (float) fundo.getWidth() / fundo.getHeight();
@@ -227,7 +228,7 @@ public class Fase2 implements Screen {
     private void criarDiscos(float dt){
         discoTimer += dt;
         
-        float bpm = 80f; //Cada batida  é uma nota inteira Seminima
+        float bpm = 138f; //Cada batida  é uma nota inteira Seminima
         float segundosporbatida = 60f / bpm;
         float clicksporbatida = segundosporbatida / 2f;      //Colcheia 2 clcks
         // float clicksporbatida = segundosporbatida / 4f;      //Semicolcheia 4 clicks

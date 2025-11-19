@@ -20,6 +20,8 @@ import com.jonatas.game.objetos.Disco;
 import com.jonatas.game.objetos.Dog;
 import com.jonatas.game.objetos.Inimigo;
 
+// ------ Fase 1 você pode perder até 10 disco bpm lento 60
+// Trocar a música e  o fundo
 
 //Deixar as musicas fora daqui
 public class Fase1 implements Screen {
@@ -225,7 +227,7 @@ public class Fase1 implements Screen {
     private void criarDiscos(float dt){
         discoTimer += dt;
         
-        float bpm = 138f; //Cada batida  é uma nota inteira Seminima
+        float bpm = 60f; //Cada batida  é uma nota inteira Seminima
         float segundosporbatida = 60f / bpm;
         float clicksporbatida = segundosporbatida / 2f;      //Colcheia 2 clcks
         // float clicksporbatida = segundosporbatida / 4f;      //Semicolcheia 4 clicks

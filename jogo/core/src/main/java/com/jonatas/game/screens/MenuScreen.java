@@ -19,7 +19,6 @@ public class MenuScreen implements Screen{
     public MenuScreen(MyGame game){
         this.game = game;
         stage = new Stage(new FitViewport(1280, 720));
-
         Gdx.input.setInputProcessor(stage);
 
         skin = new Skin(Gdx.files.absolute("C:/Users/jonat/Documents/MACKENZIE/8_Semestre/mack-cycle-runner/jogo/assets/uiskin.json"));
@@ -27,8 +26,8 @@ public class MenuScreen implements Screen{
 
         // Botão Fase 1
         TextButton btnFase1 = new TextButton("Fase 1", skin);
-        btnFase1.setSize(300, 400);
-        btnFase1.setPosition(490, 400);
+        btnFase1.setSize(300, 80);
+        btnFase1.setPosition(490, 500);
 
         btnFase1.addListener(e -> {
             if (btnFase1.isPressed()) {
@@ -39,8 +38,8 @@ public class MenuScreen implements Screen{
 
          // Botão Fase 2
         TextButton btnFase2 = new TextButton("Fase 2", skin);
-        btnFase2.setSize(400, 20);
-        btnFase2.setPosition(490, 300);
+        btnFase2.setSize(300, 80);
+        btnFase2.setPosition(490, 380);
 
         btnFase2.addListener(e -> {
             if (btnFase2.isPressed()) {
@@ -49,8 +48,22 @@ public class MenuScreen implements Screen{
             return true;
         });
 
+
+        // Botão Fase 3
+        TextButton btnFase3 = new TextButton("Fase 3 - REAL GONE", skin);
+        btnFase3.setSize(300, 80);
+        btnFase3.setPosition(490, 260);
+
+        btnFase3.addListener(e -> {
+            if (btnFase3.isPressed()) {
+                game.setScreen(new Fase3(game));
+            }
+            return true;
+        });
+           // Adiciona ao palco
         stage.addActor(btnFase1);
         stage.addActor(btnFase2);
+        stage.addActor(btnFase3);
 
     }
 
