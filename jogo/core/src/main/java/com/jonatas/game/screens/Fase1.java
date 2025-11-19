@@ -34,6 +34,8 @@ public class Fase1 implements Screen {
     Texture discoTexture;
     float discoTimer;
 
+
+
     private Dog dog;
     private Inimigo inimigo;
    
@@ -53,6 +55,7 @@ public class Fase1 implements Screen {
     private ShapeRenderer shapeRenderer;
     private String feedback;
     private float feedbackTimer;
+    Texture discoOk, discoFail;
 
     private Label feedbackLabel;
     private final float[] esteira = {1 , 4};
@@ -81,7 +84,8 @@ public class Fase1 implements Screen {
         inimigo = new Inimigo(13, 4, 3, 3, viewport);
         discoTexture = new Texture("disco.jpg");
         vetorDiscos = new Array<>();
-        
+        discoOk = new Texture("player-jump-2.png");   
+        discoFail = new Texture("enemie-attack-1.png"); 
         
         // ----- Efeitos Sonoros
         somAcerto = Gdx.audio.newSound(Gdx.files.internal("hit.wav"));
@@ -130,6 +134,7 @@ public class Fase1 implements Screen {
 
     //novo Logic - reponsável por mover as paradas
     public void updateGameObjects(float dt){
+
         dog.update(dt);
         inimigo.update(dt);
         fundoX -= velocidadeFundo * dt;
@@ -143,16 +148,19 @@ public class Fase1 implements Screen {
             disco.update(dt);
 
             // ------ Disco saindo da tela
-            if(disco.getHitbox().x < -disco.getHitbox().width){
+            if(!disco.getAcerto() && disco.getHitbox().x < -disco.getHitbox().width){
                 vetorDiscos.removeIndex(i);
-                discosPerdidosSeguidos++;
-                barraValor -=  0.2f;
-                if (barraValor < 0f) barraValor = 0;
             }
-
+            //Se passar do personagem perde ponto
+            if (!disco.getAcerto()  && !disco.getContado() && disco.getHitbox().x < dog.getHitbox().x - 2f) {
+                    disco.setContado(true);
+                    discosPerdidosSeguidos++;
+                    barraValor -= 0.2f;
+                    if (barraValor < 0f) barraValor = 0;
+            }
               // verifica game over
             if (discosPerdidosSeguidos >= 5) {
-                // game.setScreen(new GameOverScreen(game, score));
+                game.setScreen(new GameOverScreen(game, score));
             
                 return;
             }
@@ -165,6 +173,7 @@ public class Fase1 implements Screen {
             float diferencaX =  discoCentroX - dogCentroX;
             if(diferencaY < 0.5 && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){ //Verifica se esta na mesma esteira
                 if (diferencaX >= -0.7f && diferencaX < 0.5f){
+                    disco.setAcerto(true);
                     discosPerdidosSeguidos = 0;
                     score += 10;
                     feedback = "PERFEITO!";
@@ -177,7 +186,8 @@ public class Fase1 implements Screen {
                     feedbackLabel.setText(feedback);
                     scoreLabel.setText("Pontuação: " + score);
                     break;
-                }else if(diferencaX >= 0.5f && diferencaX < 1.2f){
+                }else if(diferencaX >= 0.5f && diferencaX < 1.5f){
+                    disco.setAcerto(true);
                     discosPerdidosSeguidos = 0;
                     score += 10;
                     feedback = "BOM!";
@@ -195,6 +205,12 @@ public class Fase1 implements Screen {
             }
         }
 
+        
+        if (score >= 100) {
+            game.setScreen(new VictoryScreen(game, score));
+            return;
+        }
+    
         // Decaimento do feedback 
         if (feedbackTimer > 0) {
             feedbackTimer -= dt;
@@ -202,7 +218,7 @@ public class Fase1 implements Screen {
                 feedback = "";
                 feedbackLabel.setText(feedback);
             } 
-}
+        }
     }
 
 
@@ -234,6 +250,7 @@ public class Fase1 implements Screen {
 
         
         spriteBatch.begin();
+
             spriteBatch.draw(fundo, fundoX,0, viewport.getWorldWidth(), viewport.getWorldHeight());
             spriteBatch.draw(fundo, fundoX + viewport.getWorldWidth(),0, viewport.getWorldWidth(), viewport.getWorldHeight());
 
@@ -241,6 +258,12 @@ public class Fase1 implements Screen {
             inimigo.draw(spriteBatch);
             for (Disco disco : vetorDiscos){
                 disco.draw(spriteBatch);
+            }
+            //Desenhando os discos perdidos
+            for (int i = 0; i < 5; i++) {
+                Texture img = (i < discosPerdidosSeguidos) ? discoFail : discoOk;
+                // Texture img = discoOk;
+                spriteBatch.draw(img,  10f + i , viewport.getWorldHeight() - 1f - 0.5f, 1f, 1f);
             }
         spriteBatch.end();
 

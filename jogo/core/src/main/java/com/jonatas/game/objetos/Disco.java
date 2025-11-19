@@ -13,11 +13,15 @@ public class Disco extends GameObject{
     Animation<TextureRegion> animacaoIdle;
     TextureRegion frameAtual;
     float stateTimeIdle;
+    private boolean foiAcertado;
+    private boolean foiContado;
     
     public Disco(float x, float y, float largura, float altura, Viewport viewport){
         super(x, y, largura, altura);
         this.viewport = viewport;
         this.velocidade = 4f;
+        this.foiAcertado = false;
+        this.foiContado = false;
         carregarAnimacoes();
     }
 
@@ -45,5 +49,23 @@ public class Disco extends GameObject{
     public void draw(SpriteBatch batch) {
         batch.draw(frameAtual, sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
     }
+
+    public void setAcerto(boolean acerto){
+        this.foiAcertado = acerto;
+    }
+
+    public boolean getAcerto(){
+        return this.foiAcertado;
+    }
+
+    
+    public void setContado(boolean contado){
+        this.foiContado = contado;
+    }
+
+    public boolean getContado(){
+        return this.foiContado;
+    }
+
 
 }
