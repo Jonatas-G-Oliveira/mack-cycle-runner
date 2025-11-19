@@ -24,7 +24,8 @@ public class MenuScreen implements Screen{
         stage = new Stage(new FitViewport(1280, 720));
         Gdx.input.setInputProcessor(stage);
 
-        skin = new Skin(Gdx.files.absolute("C:/Users/jonat/Documents/MACKENZIE/8_Semestre/mack-cycle-runner/jogo/assets/uiskin.json"));
+        
+        skin = new Skin(Gdx.files.internal("uiskin.json"));
 
            // --------------------------
         // TÍTULO "BARK BEAT"

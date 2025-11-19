@@ -27,11 +27,6 @@ public class Dog extends GameObject{
     TextureRegion frameAtual;
     float stateTimeIdle;
 
-    
-
-
-
-
     //Usando o construtor dinãmico
     public Dog(float x, float y, float largura, float altura, Viewport viewport){
         super(x, y, largura, altura);
@@ -72,8 +67,8 @@ public class Dog extends GameObject{
     @Override
     public void update(float delta){
     // processa input e inicia animação, se aplicável
-    if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && !pulando) {
-        // pular (ir pra cima)
+    // if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && !pulando) {
+    if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && !pulando) {
         pulando = true;
         descendo = false;
         animacaoAtual = animacaoCima;
@@ -82,8 +77,8 @@ public class Dog extends GameObject{
         sprite.setY(posY);
     }
 
-    if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT) && !descendo) {
-        // descer (ir pra baixo)
+    // if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT) && !descendo) {
+    if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN) && !pulando){
         descendo = true;
         pulando = false;
         animacaoAtual = animacaoBaixo;
