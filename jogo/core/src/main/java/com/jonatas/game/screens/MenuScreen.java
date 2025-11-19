@@ -3,8 +3,11 @@ package com.jonatas.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -23,6 +26,17 @@ public class MenuScreen implements Screen{
 
         skin = new Skin(Gdx.files.absolute("C:/Users/jonat/Documents/MACKENZIE/8_Semestre/mack-cycle-runner/jogo/assets/uiskin.json"));
 
+           // --------------------------
+        // TÍTULO "BARK BEAT"
+        // --------------------------
+        BitmapFont font = new BitmapFont();
+        font.getData().setScale(4f);
+
+        Label.LabelStyle titleStyle = new Label.LabelStyle(font, Color.WHITE);
+
+        Label titulo = new Label("BARK BEAT", titleStyle);
+        titulo.setPosition(640 - titulo.getWidth() / 2f, 620);
+        stage.addActor(titulo);
 
         // Botão Fase 1
         TextButton btnFase1 = new TextButton("Fase 1 - Behind The Clouds", skin);
