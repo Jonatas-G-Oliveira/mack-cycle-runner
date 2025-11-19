@@ -91,7 +91,7 @@ public class Fase1 implements Screen {
         
         // ----- Efeitos Sonoros
         somAcerto = Gdx.audio.newSound(Gdx.files.internal("hit.wav"));
-        musicaFase1 = Gdx.audio.newMusic(Gdx.files.internal("bankai.mp3"));
+        musicaFase1 = Gdx.audio.newMusic(Gdx.files.internal("BehindTheClouds.mp3"));
         musicaFase1.setVolume(.5f);
         
 
@@ -161,7 +161,7 @@ public class Fase1 implements Screen {
                     if (barraValor < 0f) barraValor = 0;
             }
               // verifica game over
-            if (discosPerdidosSeguidos >= 5) {
+            if (discosPerdidosSeguidos >= 10) {
                 game.setScreen(new GameOverScreen(game, score));
             
                 return;
@@ -177,7 +177,7 @@ public class Fase1 implements Screen {
                 if (diferencaX >= -0.7f && diferencaX < 0.5f){
                     disco.setAcerto(true);
                     discosPerdidosSeguidos = 0;
-                    score += 10;
+                    score += 20;
                     feedback = "PERFEITO!";
                     somAcerto.play();
                     vetorDiscos.removeIndex(i);
@@ -208,7 +208,7 @@ public class Fase1 implements Screen {
         }
 
         
-        if (score >= 100) {
+        if (score >= 500) {
             game.setScreen(new VictoryScreen(game, score));
             return;
         }
@@ -227,7 +227,7 @@ public class Fase1 implements Screen {
     private void criarDiscos(float dt){
         discoTimer += dt;
         
-        float bpm = 60f; //Cada batida  é uma nota inteira Seminima
+        float bpm = 74; //Cada batida  é uma nota inteira Seminima
         float segundosporbatida = 60f / bpm;
         float clicksporbatida = segundosporbatida / 2f;      //Colcheia 2 clcks
         // float clicksporbatida = segundosporbatida / 4f;      //Semicolcheia 4 clicks
@@ -262,10 +262,10 @@ public class Fase1 implements Screen {
                 disco.draw(spriteBatch);
             }
             //Desenhando os discos perdidos
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 10; i++) {
                 Texture img = (i < discosPerdidosSeguidos) ? discoFail : discoOk;
                 // Texture img = discoOk;
-                spriteBatch.draw(img,  10f + i , viewport.getWorldHeight() - 1f - 0.5f, 1f, 1f);
+                spriteBatch.draw(img, 6f + i , viewport.getWorldHeight() - 1f - 0.5f, 1f, 1f);
             }
         spriteBatch.end();
 
@@ -304,8 +304,28 @@ public class Fase1 implements Screen {
     }
     @Override public void pause() {}
     @Override public void resume() {}
-    @Override public void dispose() {
-        musicaFase1.dispose();
+    @Override
+        public void dispose() {
 
-    }
+            // Sons
+            somAcerto.dispose();
+            musicaFase1.dispose();
+
+            // Texturas
+            fundo.dispose();
+            discoTexture.dispose();
+            discoOk.dispose();
+            discoFail.dispose();
+
+            // Renderizadores
+            spriteBatch.dispose();
+            shapeRenderer.dispose();
+
+            // UI
+            uiStage.dispose();
+            font.dispose();
+
+            // dog.dispose();
+            // inimigo.dispose();
+        }
 }

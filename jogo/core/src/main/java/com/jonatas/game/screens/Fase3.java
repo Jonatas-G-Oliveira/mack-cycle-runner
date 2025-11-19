@@ -92,7 +92,7 @@ public class Fase3 implements Screen {
         
         // ----- Efeitos Sonoros
         somAcerto = Gdx.audio.newSound(Gdx.files.internal("hit.wav"));
-        musicaFase1 = Gdx.audio.newMusic(Gdx.files.internal("bankai.mp3"));
+        musicaFase1 = Gdx.audio.newMusic(Gdx.files.internal("RealGone.mp3"));
         musicaFase1.setVolume(.5f);
         
 
@@ -178,7 +178,7 @@ public class Fase3 implements Screen {
                 if (diferencaX >= -0.7f && diferencaX < 0.5f){
                     disco.setAcerto(true);
                     discosPerdidosSeguidos = 0;
-                    score += 10;
+                    score += 20;
                     feedback = "PERFEITO!";
                     somAcerto.play();
                     vetorDiscos.removeIndex(i);
@@ -209,7 +209,7 @@ public class Fase3 implements Screen {
         }
 
         
-        if (score >= 100) {
+        if (score >= 2000) {
             game.setScreen(new VictoryScreen(game, score));
             return;
         }
@@ -228,7 +228,7 @@ public class Fase3 implements Screen {
     private void criarDiscos(float dt){
         discoTimer += dt;
         
-        float bpm = 138f; //Cada batida  é uma nota inteira Seminima
+        float bpm = 118; //Cada batida  é uma nota inteira Seminima
         float segundosporbatida = 60f / bpm;
         float clicksporbatida = segundosporbatida / 2f;      //Colcheia 2 clcks
         // float clicksporbatida = segundosporbatida / 4f;      //Semicolcheia 4 clicks
@@ -305,8 +305,28 @@ public class Fase3 implements Screen {
     }
     @Override public void pause() {}
     @Override public void resume() {}
-    @Override public void dispose() {
-        musicaFase1.dispose();
+        @Override
+        public void dispose() {
 
-    }
+            // Sons
+            somAcerto.dispose();
+            musicaFase1.dispose();
+
+            // Texturas
+            fundo.dispose();
+            discoTexture.dispose();
+            discoOk.dispose();
+            discoFail.dispose();
+
+            // Renderizadores
+            spriteBatch.dispose();
+            shapeRenderer.dispose();
+
+            // UI
+            uiStage.dispose();
+            font.dispose();
+
+            // dog.dispose();
+            // inimigo.dispose();
+        }
 }

@@ -25,7 +25,7 @@ public class MenuScreen implements Screen{
 
 
         // Botão Fase 1
-        TextButton btnFase1 = new TextButton("Fase 1", skin);
+        TextButton btnFase1 = new TextButton("Fase 1 - Behind The Clouds", skin);
         btnFase1.setSize(300, 80);
         btnFase1.setPosition(490, 500);
 
@@ -37,7 +37,7 @@ public class MenuScreen implements Screen{
         });
 
          // Botão Fase 2
-        TextButton btnFase2 = new TextButton("Fase 2", skin);
+        TextButton btnFase2 = new TextButton("Fase 2 - Life is A Highway", skin);
         btnFase2.setSize(300, 80);
         btnFase2.setPosition(490, 380);
 

@@ -20,7 +20,7 @@ import com.jonatas.game.objetos.Disco;
 import com.jonatas.game.objetos.Dog;
 import com.jonatas.game.objetos.Inimigo;
 
-// ------ Fase 2 você pode perder até 5 disco bpm medio 80
+// ------ Fase 2 você pode perder até 7 disco bpm medio 80
 // Trocar a música e  o fundo
 
 //Deixar as musicas fora daqui
@@ -91,7 +91,7 @@ public class Fase2 implements Screen {
         
         // ----- Efeitos Sonoros
         somAcerto = Gdx.audio.newSound(Gdx.files.internal("hit.wav"));
-        musicaFase1 = Gdx.audio.newMusic(Gdx.files.internal("bankai.mp3"));
+        musicaFase1 = Gdx.audio.newMusic(Gdx.files.internal("LifeIsAHighway.mp3"));
         musicaFase1.setVolume(.5f);
         
 
@@ -161,7 +161,7 @@ public class Fase2 implements Screen {
                     if (barraValor < 0f) barraValor = 0;
             }
               // verifica game over
-            if (discosPerdidosSeguidos >= 5) {
+            if (discosPerdidosSeguidos >= 7) {
                 game.setScreen(new GameOverScreen(game, score));
             
                 return;
@@ -177,7 +177,7 @@ public class Fase2 implements Screen {
                 if (diferencaX >= -0.7f && diferencaX < 0.5f){
                     disco.setAcerto(true);
                     discosPerdidosSeguidos = 0;
-                    score += 10;
+                    score += 20;
                     feedback = "PERFEITO!";
                     somAcerto.play();
                     vetorDiscos.removeIndex(i);
@@ -208,7 +208,7 @@ public class Fase2 implements Screen {
         }
 
         
-        if (score >= 100) {
+        if (score >= 1000) {
             game.setScreen(new VictoryScreen(game, score));
             return;
         }
@@ -227,7 +227,7 @@ public class Fase2 implements Screen {
     private void criarDiscos(float dt){
         discoTimer += dt;
         
-        float bpm = 80f; //Cada batida  é uma nota inteira Seminima
+        float bpm = 103f; //Cada batida  é uma nota inteira Seminima
         float segundosporbatida = 60f / bpm;
         float clicksporbatida = segundosporbatida / 2f;      //Colcheia 2 clcks
         // float clicksporbatida = segundosporbatida / 4f;      //Semicolcheia 4 clicks
@@ -262,7 +262,7 @@ public class Fase2 implements Screen {
                 disco.draw(spriteBatch);
             }
             //Desenhando os discos perdidos
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 7; i++) {
                 Texture img = (i < discosPerdidosSeguidos) ? discoFail : discoOk;
                 // Texture img = discoOk;
                 spriteBatch.draw(img,  10f + i , viewport.getWorldHeight() - 1f - 0.5f, 1f, 1f);
@@ -304,8 +304,28 @@ public class Fase2 implements Screen {
     }
     @Override public void pause() {}
     @Override public void resume() {}
-    @Override public void dispose() {
-        musicaFase1.dispose();
+    @Override
+        public void dispose() {
 
-    }
+            // Sons
+            somAcerto.dispose();
+            musicaFase1.dispose();
+
+            // Texturas
+            fundo.dispose();
+            discoTexture.dispose();
+            discoOk.dispose();
+            discoFail.dispose();
+
+            // Renderizadores
+            spriteBatch.dispose();
+            shapeRenderer.dispose();
+
+            // UI
+            uiStage.dispose();
+            font.dispose();
+
+            // dog.dispose();
+            // inimigo.dispose();
+        }
 }
